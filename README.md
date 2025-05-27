@@ -2,6 +2,8 @@
 
 A glassy, modern weather dashboard built with React and Vite.
 
+Live link -  https://www.vishwavijeta.info/project/qodex/
+
 ## Features
 
 - City search with instant weather and 5-day forecast
