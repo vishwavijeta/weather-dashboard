@@ -1,44 +1,65 @@
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useRef } from "react";
 
 const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
 
-const WEATHER_URL = (city, unit) =>
-    `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${unit}&appid=${API_KEY}`;
-const FORECAST_URL = (city, unit) =>
-    `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=${unit}&appid=${API_KEY}`;
-
+// useRef to store error state across re-renders
 export const useWeatherApi = (city, unit) => {
-    const [weather, setWeather] = useState(null);
-    const [forecast, setForecast] = useState(null);
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(true);
+    const lastCityRef = useRef(city);
+
+    // Reset error when city changes
+    if (lastCityRef.current !== city) {
+        lastCityRef.current = city;
+    }
 
     const fetchWeather = async () => {
-        setLoading(true);
-        setError("");
-        try {
-            const [res1, res2] = await Promise.all([
-                fetch(WEATHER_URL(city, unit)),
-                fetch(FORECAST_URL(city, unit)),
-            ]);
-            if (!res1.ok) throw new Error("Weather not found");
-            const weatherData = await res1.json();
-            const forecastData = await res2.json();
-            setWeather(weatherData);
-            setForecast(forecastData);
-        } catch (err) {
-            setError(err.message);
-            setWeather(null);
-            setForecast(null);
-        }
-        setLoading(false);
+        if (!city) return null;
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${unit}&appid=${API_KEY}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Weather not found");
+        return res.json();
     };
 
-    useEffect(() => {
-        fetchWeather();
-        const timer = setInterval(fetchWeather, 30000);
-        return () => clearInterval(timer);
-    }, [city, unit]);
+    const fetchForecast = async () => {
+        if (!city) return null;
+        const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=${unit}&appid=${API_KEY}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Forecast not found");
+        return res.json();
+    };
 
-    return { weather, forecast, error, loading };
+    // React Query will re-run if 'city' or 'unit' changes
+    const {
+        data: weather,
+        error: weatherError,
+        isLoading: loadingWeather,
+    } = useQuery({
+        queryKey: ["weather", city, unit],
+        queryFn: fetchWeather,
+        enabled: !!city,
+        refetchInterval: 30000,
+        staleTime: 1000 * 60 * 2,
+        retry: false, // Prevent React Query from retrying if there's an error
+    });
+
+    const {
+        data: forecast,
+        error: forecastError,
+        isLoading: loadingForecast,
+    } = useQuery({
+        queryKey: ["forecast", city, unit],
+        queryFn: fetchForecast,
+        enabled: !!city && !weatherError, // Disable if weather has error
+        refetchInterval: 30000,
+        staleTime: 1000 * 60 * 2,
+        retry: false,
+    });
+
+    // Only show error if one exists
+    return {
+        weather,
+        forecast,
+        error: weatherError || forecastError,
+        loading: loadingWeather || loadingForecast,
+    };
 };

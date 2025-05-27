@@ -29,7 +29,8 @@ const WeatherContent = () => {
       </div>
       <SearchBar />
       <ErrorMessage error={error} />
-      {loading ? <p>Loading...</p> : (
+      {loading && <p>Loading...</p>}
+      {!loading && !error && (
         <WeatherCard weather={weather} forecast={forecast} city={city} unit={unit} />
       )}
     </div>
