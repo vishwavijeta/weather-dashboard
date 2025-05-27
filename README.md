@@ -16,7 +16,7 @@ Live link -  https://www.vishwavijeta.info/project/qodex/
 ## Setup
 
 1. `npm install`
-2. Copy `.env.example` to `.env` and add your OpenWeatherMap API key.
+2. Add your OpenWeatherMap API key in `.env`
 3. `npm run dev`
 
 ## Folder Structure
