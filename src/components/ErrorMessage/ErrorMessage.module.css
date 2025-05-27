@@ -1,0 +1,11 @@
+.error {
+    background: #ff5f57;
+    color: #fff;
+    border-radius: 6px;
+    padding: 0.7rem 1.1rem;
+    margin: 1.2rem 0 0.5rem 0;
+    font-weight: 500;
+    font-size: 1.08rem;
+    box-shadow: 0 2px 8px rgba(255, 95, 87, 0.12);
+    letter-spacing: 0.02em;
+}

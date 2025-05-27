@@ -1,0 +1,31 @@
+.locationTime {
+  position: absolute;
+  top: 24px;
+  right: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.place {
+  font-size: 1.1rem;
+  font-weight: 500;
+  opacity: 0.88;
+  letter-spacing: 0.02em;
+  text-transform: capitalize;
+}
+.time {
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
+  opacity: 0.9;
+}
+
+@media (max-width: 600px) {
+  .locationTime {
+    top: 16px;
+    right: 16px;
+  }
+  .place, .time {
+    font-size: 1rem;
+  }
+}
